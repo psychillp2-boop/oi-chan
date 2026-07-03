@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trading OS Realtime</title>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <style>
+        body {
+            background:#0f172a;
+            color:white;
+            font-family:Arial;
+            padding:20px;
+        }
+
+        h1 { color:#38bdf8; }
+
+        .card {
+            background:#1e293b;
+            padding:15px;
+            margin-bottom:20px;
+            border-radius:10px;
+        }
+
+        table {
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th, td {
+            padding:10px;
+            border-bottom:1px solid #1e293b;
+            text-align:center;
+        }
+
+        .good { color:#22c55e; }
+        .bad { color:#ef4444; }
+    </style>
+</head>
+
+<body>
+
+<h1>🧠 REALTIME TRADING OS</h1>
+
+<div class="card">
+    <p id="balance"></p>
+    <p id="equity"></p>
+    <p id="profit"></p>
+    <p id="margin"></p>
+</div>
+
+<div class="card">
+    <h2>Positions</h2>
+    <table id="table"></table>
+</div>
+
+<script>
+
+const socket = io();
+
+socket.on("update", function(data) {
+
+    document.getElementById("balance").innerHTML = "Balance: " + data.balance;
+    document.getElementById("equity").innerHTML = "Equity: " + data.equity;
+    document.getElementById("profit").innerHTML = "Profit: " + data.profit;
+    document.getElementById("margin").innerHTML = "Margin: " + data.margin;
+
+    let table = `
+        <tr>
+            <th>Symbol</th>
+            <th>Type</th>
+            <th>Lot</th>
+            <th>Profit</th>
+        </tr>
+    `;
+
+    data.positions.forEach(p => {
+
+        let color = p.profit >= 0 ? "lime" : "red";
+
+        table += `
+            <tr>
+                <td>${p.symbol}</td>
+                <td>${p.type}</td>
+                <td>${p.volume}</td>
+                <td style="color:${color}">
+                    ${p.profit}
+                </td>
+            </tr>
+        `;
+    });
+
+    document.getElementById("table").innerHTML = table;
+
+});
+
+</script>
+
+</body>
+</html>
